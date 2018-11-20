@@ -1,0 +1,9 @@
+.stack-work
+la-dict
+*.aux
+*.pdf
+OUT.tex
+*.log
+DICT_OUT
+LOG
+DICT_
