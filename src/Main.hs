@@ -129,6 +129,7 @@ parseAdj x = Adj l1 l2 l3
           x -> x
 parseAdv x = Adv x
 parsePrep x = Prep x
+parseOther x = Other x
 
 parseLine :: String -> [WordSet]
 parseLine x = w''
@@ -144,6 +145,7 @@ parseLine x = w''
           "adj" -> [WordSet (parseAdj w') m' r']
           "adv" -> [WordSet (parseAdv w') m' r']
           "prep" -> [WordSet (parsePrep w') m' r']
+          "o" -> [WordSet (parseOther w') m' r']
           _ -> []
 
 parse src = l >>= parseLine
