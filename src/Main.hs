@@ -40,13 +40,14 @@ suffix a ('-':b) = suffix' a b
 suffix a b = suffix' a b
 
 ---------
-data WordSex = Male | Female | Neutral | MF
+data WordSex = Masculine | Feminine | Neuter | MF
   deriving Eq
 data WordT = Noun String String WordSex
            | Verb String String String String
            | Adj String String String
            | Adv String
            | Prep String
+           | Other String
   deriving Eq
 type Meaning = String
 type Comment = String
@@ -54,9 +55,9 @@ data WordSet = WordSet WordT Meaning Comment
 type WordList = [WordSet]
 
 instance Show WordSex where
-  show Male = "m"
-  show Female = "f"
-  show Neutral = "n"
+  show Masculine = "m"
+  show Feminine = "f"
+  show Neuter = "n"
   show MF = "mf"
 instance Show WordT where
   show (Noun a b s) = "n: " ++ a ++ "," ++ b ++ "," ++ show s
@@ -64,6 +65,7 @@ instance Show WordT where
   show (Adj a b c) = "adj: " ++ a ++ "," ++ b ++ "," ++ c
   show (Adv s) = "adv: " ++ s
   show (Prep s) = "prep: " ++ s
+  show (Other s) = "o: " ++ s
 instance Show WordSet where
   show (WordSet t m c) = show t ++ " [" ++ m ++ "] " ++ c
 
@@ -73,6 +75,7 @@ instance Ord WordT where
   (Adj a _ _) <= (Adj b _ _) = a <= b
   (Adv a) <= (Adv b) = a <= b
   (Prep a) <= (Prep b) = a <= b
+  (Other a) <= (Other b) = a <= b
   (Noun _ _ _) <= _ = True
   _ <= (Noun _ _ _) = False
   (Verb _ _ _ _) <= _ = True
@@ -81,6 +84,8 @@ instance Ord WordT where
   _ <= (Adj _ _ _) = False
   (Adv _) <= _ = True
   _ <= (Adv _) = False
+  (Prep _) <= _ = True
+  _ <= (Prep _) = False
 
 instance Eq WordSet where
   (WordSet a _ _) == (WordSet b _ _) = a <= b && a >= b
@@ -89,9 +94,9 @@ instance Ord WordSet where
   (WordSet a _ _) <= (WordSet b _ _) = a <= b
 
 parseSex x = case x of
-  "m" -> Male
-  "f" -> Female
-  "n" -> Neutral
+  "m" -> Masculine
+  "f" -> Feminine
+  "n" -> Neuter
   "mf" -> MF
 
 parseNoun x = Noun l1 l2 l3
