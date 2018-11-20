@@ -35,6 +35,7 @@ resolver: lts-12.19
 #  - wai
 packages:
 - .
+- https://github.com/haskell/process/archive/v1.6.4.0.tar.gz
 # Dependency packages to be pulled from upstream that are not in the resolver
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
