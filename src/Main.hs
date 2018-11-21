@@ -93,6 +93,27 @@ instance Eq WordSet where
 instance Ord WordSet where
   (WordSet a _ _) <= (WordSet b _ _) = a <= b
 
+
+cmpLe (WordSet a1 a2 _) (WordSet b1 b2 _) = case (a1, b1) of
+  (Noun a _ _, Noun b _ _) -> compare a2 b2
+  (Verb a _ _ _, Verb b _ _ _) -> compare a2 b2
+  (Adj a _ _, Adj b _ _) -> compare a2 b2
+  (Adv a, Adv b) -> compare a2 b2
+  (Prep a, Prep b) -> compare a2 b2
+  (Other a, Other b) -> compare a2 b2
+  (Noun _ _ _, _) -> LT
+  (_, Noun _ _ _) -> GT
+  (Verb _ _ _ _, _) -> LT
+  (_, Verb _ _ _ _) -> GT
+  (Adj _ _ _, _) -> LT
+  (_, Adj _ _ _) -> GT
+  (Adv _, _) -> LT
+  (_, Adv _) -> GT
+  (Prep _, _) -> LT
+  (_, Prep _) -> GT
+
+showMean (WordSet t m c) = "[" ++ m ++ "] " ++ show t ++ " " ++ c
+
 parseSex x = case x of
   "m" -> Masculine
   "f" -> Feminine
@@ -151,18 +172,21 @@ parseLine x = w''
 parse src = l >>= parseLine
   where l = map strip $ splitOn '\n' src
 
-texfy s = concat $ map ((++ "\\newline ") . show) s
+texfy s1 s2 = s1' ++ "\\newline\\newline " ++ s2'
+  where s1' = concat $ map ((++ "\\newline ") . show) s1
+        s2' = concat $ map ((++ "\\newline ") . showMean) s2
 
 main :: IO ()
 main = do
   s <- readFile "DICT"
   let r = parse s
-  let r' = sort r
-  putStrLn $ show r'
+  let r1 = sort r
+  let r2 = sortBy cmpLe r
+  putStrLn $ show r1
   writeFile "DICT_" s
-  writeFile "DICT" $ concat $ map ((++ "\n") . show) r'
+  writeFile "DICT" $ concat $ map ((++ "\n") . show) r1
   t <- readFile "TEMPLATE.tex"
-  let t' = replacePPP (texfy r') t
+  let t' = replacePPP (texfy r1 r2) t
   writeFile "OUT.tex" t'
   system "pdflatex OUT.tex > LOG"
   system "rm OUT.aux OUT.log"
